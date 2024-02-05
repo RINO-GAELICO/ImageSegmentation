@@ -1,0 +1,90 @@
+salloc --nodes 1 --qos interactive --time 00:30:00 --constraint cpu --account=m3930  --perf=generic
+module load e4s/23.05
+spack env activate gcc
+spack load likwid
+
+unset OMP_NUM_THREADS
+export OMP_PLACES=threads
+export OMP_PROC_BIND=spread
+
+export PERF_COUNTER_GROUP=FLOPS_DP
+export PERF_COUNTER_GROUP=L2CACHE
+export PERF_COUNTER_GROUP=L3CACHE
+
+export MARKER_FLAG="-m"	
+
+
+likwid-perfctr $MARKER_FLAG -g $PERF_COUNTER_GROUP -C N:0-0 main/main ../data/512_building.gif 200 10 10 "OPEN_MP"
+likwid-perfctr $MARKER_FLAG -g $PERF_COUNTER_GROUP -C N:0-1  main/main ../data/512_building.gif 200 10 10 "OPEN_MP"
+likwid-perfctr $MARKER_FLAG -g $PERF_COUNTER_GROUP -C N:0-3  main/main ../data/512_building.gif 200 10 10 "OPEN_MP"
+likwid-perfctr $MARKER_FLAG -g $PERF_COUNTER_GROUP -C N:0-7  main/main ../data/512_building.gif 200 10 10 "OPEN_MP"
+likwid-perfctr $MARKER_FLAG -g $PERF_COUNTER_GROUP -C N:0-15  main/main ../data/512_building.gif 200 10 10 "OPEN_MP"
+likwid-perfctr $MARKER_FLAG -g $PERF_COUNTER_GROUP -C N:0-31  main/main ../data/512_building.gif 200 10 10 "OPEN_MP"
+likwid-perfctr $MARKER_FLAG -g $PERF_COUNTER_GROUP -C N:0-63  main/main ../data/512_building.gif 200 10 10 "OPEN_MP"
+likwid-perfctr $MARKER_FLAG -g $PERF_COUNTER_GROUP -C N:0-127  main/main ../data/512_building.gif 200 10 10 "OPEN_MP"
+
+
+likwid-perfctr $MARKER_FLAG -g $PERF_COUNTER_GROUP -C N:0-0  main/main ../data/1024_building.jpeg 200 10 10 "OPEN_MP"
+likwid-perfctr $MARKER_FLAG -g $PERF_COUNTER_GROUP -C N:0-1  main/main ../data/1024_building.jpeg 200 10 10 "OPEN_MP"
+likwid-perfctr $MARKER_FLAG -g $PERF_COUNTER_GROUP -C N:0-3  main/main ../data/1024_building.jpeg 200 10 10 "OPEN_MP"
+likwid-perfctr $MARKER_FLAG -g $PERF_COUNTER_GROUP -C N:0-7  main/main ../data/1024_building.jpeg 200 10 10 "OPEN_MP"
+likwid-perfctr $MARKER_FLAG -g $PERF_COUNTER_GROUP -C N:0-15  main/main ../data/1024_building.jpeg 200 10 10 "OPEN_MP"
+likwid-perfctr $MARKER_FLAG -g $PERF_COUNTER_GROUP -C N:0-31  main/main ../data/1024_building.jpeg 200 10 10 "OPEN_MP"
+likwid-perfctr $MARKER_FLAG -g $PERF_COUNTER_GROUP -C N:0-63  main/main ../data/1024_building.jpeg 200 10 10 "OPEN_MP"
+
+
+likwid-perfctr $MARKER_FLAG -g $PERF_COUNTER_GROUP -C N:0-0  main/main ../data/2048_building.jpeg 200 10 10 "OPEN_MP"
+likwid-perfctr $MARKER_FLAG -g $PERF_COUNTER_GROUP -C N:0-1  main/main ../data/2048_building.jpeg 200 10 10 "OPEN_MP"
+likwid-perfctr $MARKER_FLAG -g $PERF_COUNTER_GROUP -C N:0-3  main/main ../data/2048_building.jpeg 200 10 10 "OPEN_MP"
+likwid-perfctr $MARKER_FLAG -g $PERF_COUNTER_GROUP -C N:0-7  main/main ../data/2048_building.jpeg 200 10 10 "OPEN_MP"
+likwid-perfctr $MARKER_FLAG -g $PERF_COUNTER_GROUP -C N:0-15  main/main ../data/2048_building.jpeg 200 10 10 "OPEN_MP"
+likwid-perfctr $MARKER_FLAG -g $PERF_COUNTER_GROUP -C N:0-31  main/main ../data/2048_building.jpeg 200 10 10 "OPEN_MP"
+likwid-perfctr $MARKER_FLAG -g $PERF_COUNTER_GROUP -C N:0-63  main/main ../data/2048_building.jpeg 200 10 10 "OPEN_MP"
+
+
+likwid-perfctr $MARKER_FLAG -g $PERF_COUNTER_GROUP -C N:0-0  main/main ../data/4096_building.jpeg 200 10 10 "OPEN_MP"
+likwid-perfctr $MARKER_FLAG -g $PERF_COUNTER_GROUP -C N:0-1  main/main ../data/4096_building.jpeg 200 10 10 "OPEN_MP"
+likwid-perfctr $MARKER_FLAG -g $PERF_COUNTER_GROUP -C N:0-3  main/main ../data/4096_building.jpeg 200 10 10 "OPEN_MP"
+likwid-perfctr $MARKER_FLAG -g $PERF_COUNTER_GROUP -C N:0-7  main/main ../data/4096_building.jpeg 200 10 10 "OPEN_MP"
+likwid-perfctr $MARKER_FLAG -g $PERF_COUNTER_GROUP -C N:0-15  main/main ../data/4096_building.jpeg 200 10 10 "OPEN_MP"
+likwid-perfctr $MARKER_FLAG -g $PERF_COUNTER_GROUP -C N:0-31  main/main ../data/4096_building.jpeg 200 10 10 "OPEN_MP"
+likwid-perfctr $MARKER_FLAG -g $PERF_COUNTER_GROUP -C N:0-63  main/main ../data/4096_building.jpeg 200 10 10 "OPEN_MP"
+
+
+
+salloc -C gpu -t 30 -c 10 -G 1 -q interactive -A m3930
+
+module load PrgEnv-nvidia 
+export CC=cc
+export CXX=CC
+
+
+main/main ../data/512_building.gif 200 10 10 "CUDA"
+main/main ../data/1024_building.jpeg 200 10 10 "CUDA"
+
+
+dcgmi profile --pause
+
+ncu --set default --section SourceCounters --metrics smsp__cycles_active.avg.pct_of_peak_sustained_elapsed,dram__throughput.avg.pct_of_peak_sustained_elapsed,gpu__time_duration.avg main/main ../data/512_building.gif 200 10 10 "CUDA"
+
+ncu --set default --section SourceCounters --metrics smsp__cycles_active.avg.pct_of_peak_sustained_elapsed,dram__throughput.avg.pct_of_peak_sustained_elapsed,gpu__time_duration.avg main/main ../data/1024_building.jpeg 200 10 10 "CUDA"
+
+ncu --set default --section SourceCounters --metrics smsp__cycles_active.avg.pct_of_peak_sustained_elapsed,dram__throughput.avg.pct_of_peak_sustained_elapsed,gpu__time_duration.avg main/main ../data/2048_building.jpeg 200 10 10 "CUDA"
+
+ncu --set default --section SourceCounters --metrics smsp__cycles_active.avg.pct_of_peak_sustained_elapsed,dram__throughput.avg.pct_of_peak_sustained_elapsed,gpu__time_duration.avg main/main ../data/4096_building.jpeg 200 10 10 "CUDA"
+
+
+
+export OMP_NUM_THREADS=1
+export OMP_NUM_THREADS=2
+export OMP_NUM_THREADS=4
+export OMP_NUM_THREADS=8
+export OMP_NUM_THREADS=16
+export OMP_NUM_THREADS=32
+export OMP_NUM_THREADS=64
+
+
+
+
+
+
